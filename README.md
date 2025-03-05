@@ -2,7 +2,7 @@
 
 Run the 	`create_server.ipynb` on the Chameleon interface to start your instance and install all dependencies for the experiment.
 
-The p100 node doesn't allow you to install python packages systemwide so we do it in a virtualenv.
+The p100 node doesn't allow you to install python packages systemwide so we do it in a virtualenv. 
 ```
 sudo apt-get install python3-pip python-venv
 python3 -m venv .venv
@@ -11,10 +11,6 @@ pip install torch torchvision transformers onnx onnxruntime-gpu requests
 pip install tritonclient[all] tritonserver
 ```
 
-We will generate an onnx model from the pre-trained BLIP model that will be deployed on Trition. 
-```
-python3 generate_onnx.py
-```
 
 ### Setting up Trition Server
 
@@ -58,4 +54,6 @@ perf_analyzer -m multi_gpu_dynamic_batching localhost:8000 --concurrency-range 1
 ```
 
 Replace `multi_gpu_dynamic_batching` with appropriate models to profile all the models.
+
+The results of the performance analyzer experiments on different configs is [linked here](https://docs.google.com/document/d/19h2KS1Ec0joOoNzzzspa8D8L24xzdzHU4pegB9TbNhs/edit?tab=t.0)
 
