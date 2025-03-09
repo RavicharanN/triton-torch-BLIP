@@ -1,17 +1,15 @@
-name: "image_caption_gpu"
+name: "conditional_captioning"
 backend: "python"
 max_batch_size: 8
-instance_group [
-  {
-    kind: KIND_GPU
-    count: 1
-    gpus: [0]
-  }
-]
 input [
   {
     name: "INPUT"
     data_type: TYPE_STRING
+    dims: [1]
+  },
+  {
+    name: "FOOD_LABEL"
+    data_type: TYPE_STRING  # additional text input from food classifier
     dims: [1]
   }
 ]
