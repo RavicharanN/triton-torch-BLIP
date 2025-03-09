@@ -21,11 +21,11 @@ ensemble_scheduling {
       model_name: "food_classifier"
       model_version: -1      # Tells triton to use the latest version of the model
       input_map {
-        key: "INPUT_IMAGE"   # Map the "input" of the ensemble to the "input" of the food classifier
+        key: "INPUT_IMAGE"   # Map the input of the ensemble to the input of the food classifier
         value: "INPUT_IMAGE"
       }
       output_map {
-        key: "FOOD_LABEL"    # Map the "output" of classifier to "text input" of the captioning model
+        key: "FOOD_LABEL"    # Map the output of classifier to text input of the captioning model
         value: "FOOD_LABEL"
       }
     },
@@ -37,7 +37,7 @@ ensemble_scheduling {
         value: "INPUT_IMAGE"
       }
       input_map {
-        key: "FOOD_LABEL"    # Map the "output" of classifier to the "condition" for the captioning model 
+        key: "FOOD_LABEL"    # Map the output of classifier to the condition for the captioning model 
         value: "FOOD_LABEL"
       }
       output_map {
