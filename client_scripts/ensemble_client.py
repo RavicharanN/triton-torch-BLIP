@@ -8,7 +8,7 @@ def main(image_path):
         image_bytes = f.read()
 
     # Create a Triton Inference Server client
-    triton_client = httpclient.InferenceServerClient(url="localhost:8000", verbose=True)
+    triton_client = httpclient.InferenceServerClient(url="localhost:8000", verbose=False)
 
     # Create the input tensor for the image.
     # Although the model config uses TYPE_STRING, for the client we use "BYTES" to send raw byte data.
@@ -27,4 +27,4 @@ def main(image_path):
 
     print("Generated Caption:", caption[0])
     
-main("test_image.jpg")
+main("./test_image.jpg")
