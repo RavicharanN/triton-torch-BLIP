@@ -1,4 +1,4 @@
-# Model Serving - Image captioning with BLIP
+# Model Serving 
 
 We're using NVIDIA's Triton to serve our Food11 Classifier model, and we're looking into options to leverage our resources to speed up inference and boost throughput.
 
