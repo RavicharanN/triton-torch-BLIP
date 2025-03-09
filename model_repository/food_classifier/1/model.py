@@ -37,7 +37,10 @@ class TritonPythonModel:
         # Assume the image_data is a Base64-encoded string.
         if isinstance(image_data, str):
             image_data = base64.b64decode(image_data)
-            
+            print("Recognised as stirng")
+            print("Decoded data:", image_data.dtype())
+        
+        print("Decoded data:", image_data.dtype())
         # Open the image from the bytes and convert to RGB.
         image = Image.open(io.BytesIO(image_data)).convert('RGB')
         # Apply the preprocessing transforms.
