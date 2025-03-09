@@ -1,0 +1,17 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Copy only requirements and main.py
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
+RUN pip install fastapi uvicorn jupyter
+
+COPY main.py .
+
+# Expose FastAPI and Jupyter ports
+EXPOSE 8080 8888
+
+# Launch both FastAPI and Jupyter
+CMD bash -c "uvicorn main:app --host 0.0.0.0 --port 8080 & \
+    jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root"
