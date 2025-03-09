@@ -1,41 +1,55 @@
-## Model Serving - Image captioning with BLIP
+# Model Serving - Image captioning with BLIP
 
-Run the 	`create_server.ipynb` on the Chameleon interface to start your instance and install all dependencies for the experiment.
+We're using NVIDIA's Triton to serve our Food11 Classifier model, and we're looking into options to leverage our resources to speed up inference and boost throughput.
 
-The p100 node doesn't allow you to install python packages systemwide so we do it in a virtualenv. 
+We'll also perform conditional captioning using model ensembling—basically, generating a caption for the image based on the label output from the classifier, which is then fed into the BLIP captioning model.
+
+The experiments will be run on a P100 node on Chameleon. Run the 	`create_server.ipynb` on the Chameleon interface to start your instance and install all dependencies for the experiment. Clone this repository on your P100 node.
+
+## Experimental Setup
+
+We will deploy our models on the Triton Inference Server in a container running on the P100 node, and run everything else (profiling, serving the model through an endpoint) on a separate Python container.
+
+#### Triton Server 
+
+The `Dockerfile.triton` pulls the Triton container and installs all the dependencies needed for inference. This file is already provided in the repository (more details on the Triton's `model_repository` structure and configurations are in the next section).
+
+To build the docker image, run:
 ```
-sudo apt-get install python3-pip python-venv
-python3 -m venv .venv
-source .venv/bin/activate
-pip install torch torchvision transformers onnx onnxruntime-gpu requests
-pip install tritonclient[all] tritonserver
+docker build -f Dockerfile.triton -t tritonserver-image .
 ```
-
-
-### Setting up Trition Server
-
-In the root of the project directory build the docker image for the triton server
-
+Launch the triton server with:
 ```
-docker build -t custom-tritonserver .
-```
-
-Start the triton server
-
-```
-sudo docker run --gpus all --rm -p 8000:8000 -p 8001:8001 -p 8002:8002 -v ${PWD}/model_repository:/models custom-tritonserver tritonserver --model-repository=/models
-```
-
-You will now have the server running at `localhost:8000` for inference. Test a sample inference by running the `triton_client.py` in the root of this directory.
-
-### Setting up the FastAPI server 
-
-To wrap the trition server around fastAPI and make it availalbe via an endpoint run:
-
-```
-uvicorn main:app --reload --port 8080
+sudo docker run --gpus all \ 
+	--rm -p 8000:8000 -p 8001:8001 -p 8002:8002 \
+	-v ${PWD}/model_repository:/models custom-tritonserver \
+	tritonserver --model-repository=/models
 ```
 
+This command mounts your `model_repository` into the Triton container and serves the models on `localhost:8000`.
+
+#### Triton Client and FastAPI Server
+
+Next, we'll launch another container to handle the rest of our experiments:
+
+1.  Serving models through a FastAPI endpoint.
+2.  Running Python scripts that send inference requests to the Triton Server (for testing the model deployment with an example).
+3.  Profiling the models on the Triton Server under load.
+
+To build the Docker image for this container, run:
+```
+docker build -f Dockerfile.triton -t fastapi-jupyter-image .
+```
+Start the FastAPI server (running on port 8080) and a Jupyter server (running on port 8888) with:
+```
+sudo docker run --name fastapi-jupyter-container \ 
+	-p 8080:8080 \
+	-p 8888:8888 \
+	-v $(pwd)/client_scripts:/app/client_scripts \
+	fastapi-jupyter-image
+```
+
+#### ========  Documentation beyond this point is WIP ============================
 Make this avaialbe on your local machine by enabling SSH tunneling
 
 ```
