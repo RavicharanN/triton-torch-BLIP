@@ -49,6 +49,27 @@ sudo docker run --name fastapi-jupyter-container \
 	fastapi-jupyter-image
 ```
 
+## Understanding the Triton Repository and Config Structure 
+
+The Triton Inference Server uses a structured directory (model repository) to manage and serve our models. Each model served by Triton resides in its own directory within the `model_repository`, and each directory follows a specific naming and versioning convention.
+
+The Triton model repository structure looks like this: 
+
+```
+model_repository/
+├── model_A/
+│   ├── config.pbtxt
+│   └── 1/				# Version 1 of model_A
+│       └── model.py	
+├── model_B/
+│   ├── config.pbtxt	# Config files can be unique to each model
+│   ├── 1/				# Version 1 of model_B
+│   │   └── model.pt
+│   └── 2/				# Version 2 of model_B
+│       └── model.pt
+```
+
+### Config.pbtxt
 
 
 ### ========  Documentation beyond this point is WIP ============================
