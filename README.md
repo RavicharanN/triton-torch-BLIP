@@ -4,7 +4,7 @@ We're using NVIDIA's Triton to serve our Food11 Classifier model, and will be ru
 
 We'll also perform conditional captioning using model ensembling — generating a caption for the image based on the label output from the classifier, which is then fed into the BLIP captioning model.
 
-The experiments will be run on a P100 node on Chameleon. Run the 	`create_server.ipynb` on the Chameleon interface to start your instance and install all dependencies for the experiment. Clone this repository on your P100 node.
+The experiments will be run on a P100 node on Chameleon.  Run the `create_server.ipynb` on the Chameleon interface to start your instance and install all dependencies for the experiment. Clone this repository on your P100 node.
 
 ## Experimental Setup
 
