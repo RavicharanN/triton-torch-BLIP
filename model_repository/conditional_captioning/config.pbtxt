@@ -4,7 +4,7 @@ max_batch_size: 8
 input [
   {
     name: "INPUT"
-    data_type: TYPE_STRING
+    data_type: TYPE_STRING  # Input image sent as a base64 encoded string
     dims: [1]
   },
   {
@@ -16,7 +16,7 @@ input [
 output [
   {
     name: "OUTPUT"
-    data_type: TYPE_STRING
+    data_type: TYPE_STRING  # Generated caption through BLIP
     dims: [1]
   }
 ]

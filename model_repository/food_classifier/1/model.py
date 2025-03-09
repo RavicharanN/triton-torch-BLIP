@@ -6,7 +6,7 @@ from PIL import Image
 import torch
 import torchvision.transforms as transforms
 import triton_python_backend_utils as pb_utils
-from torchvision.models.mobilenetv2 import MobileNetV2  # required global for safe_globals
+from torchvision.models.mobilenetv2 import MobileNetV2
 import torch.serialization
 
 class TritonPythonModel:
@@ -14,7 +14,7 @@ class TritonPythonModel:
         model_dir = os.path.dirname(__file__)
         model_path = os.path.join(model_dir, "food11.pth")
         
-        # Use safe_globals to allow the MobileNetV2 global and force weights_only=False.
+        # Use safe_globals to allow the MobileNetV2 global
         with torch.serialization.safe_globals([MobileNetV2]):
             self.model = torch.load(model_path, map_location=torch.device('cpu'), weights_only=False)
         self.model.eval()
@@ -78,4 +78,3 @@ class TritonPythonModel:
                 output_tensors=[out_tensor_label, out_tensor_prob])
             responses.append(inference_response)
         return responses
-

@@ -4,14 +4,14 @@ max_batch_size: 8
 input [
   {
     name: "INPUT_IMAGE"
-    data_type: TYPE_STRING
+    data_type: TYPE_STRING  # Same as the input to the food classifier
     dims: [1]
   }
 ]
 output [
   {
     name: "OUTPUT"
-    data_type: TYPE_STRING
+    data_type: TYPE_STRING  # Same as the output of the conditional_captioning model
     dims: [1]
   }
 ]
@@ -19,25 +19,25 @@ ensemble_scheduling {
   step [
     {
       model_name: "food_classifier"
-      model_version: -1
+      model_version: -1      # Tells triton to use the latest version of the model
       input_map {
-        key: "INPUT_IMAGE"
+        key: "INPUT_IMAGE"   # Map the "input" of the ensemble to the "input" of the food classifier
         value: "INPUT_IMAGE"
       }
       output_map {
-        key: "FOOD_LABEL"
+        key: "FOOD_LABEL"    # Map the "output" of classifier to "text input" of the captioning model
         value: "FOOD_LABEL"
       }
     },
     {
       model_name: "conditional_captioning"
-      model_version: -1
+      model_version: -1      # Tells triton to use the latest version of the model
       input_map {
         key: "INPUT"
         value: "INPUT_IMAGE"
       }
       input_map {
-        key: "FOOD_LABEL"
+        key: "FOOD_LABEL"    # Map the "output" of classifier to the "condition" for the captioning model 
         value: "FOOD_LABEL"
       }
       output_map {
