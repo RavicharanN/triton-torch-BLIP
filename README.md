@@ -10,7 +10,7 @@ The experiments will be run on a P100 node on Chameleon.  Run the `create_server
 
 We will deploy our models on the Triton Inference Server in a container running on the P100 node, and run everything else (profiling, serving the model through an endpoint) on a separate Python container.
 
-#### Triton Server 
+### Triton Server 
 
 The `Dockerfile.triton` pulls the Triton container and installs all the dependencies needed for inference. This file is already provided in the repository (more details on the Triton's `model_repository` structure and configurations are in the next section).
 
@@ -28,7 +28,7 @@ sudo docker run --gpus all \
 
 This command mounts your `model_repository` into the Triton container and serves the models on `localhost:8000`.
 
-#### Triton Client and FastAPI Server
+### Triton Client and FastAPI Server
 
 Next, we'll launch another container to handle the rest of our experiments:
 
@@ -49,7 +49,9 @@ sudo docker run --name fastapi-jupyter-container \
 	fastapi-jupyter-image
 ```
 
-#### ========  Documentation beyond this point is WIP ============================
+
+
+### ========  Documentation beyond this point is WIP ============================
 Make this avaialbe on your local machine by enabling SSH tunneling
 
 ```
