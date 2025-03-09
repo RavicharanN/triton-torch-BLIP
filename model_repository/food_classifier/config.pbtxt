@@ -1,6 +1,6 @@
 name: "food_classifier"
 backend: "python"
-max_batch_size: 8
+max_batch_size: 1
 input [
   {
     name: "INPUT_IMAGE"
