@@ -1,22 +1,29 @@
-name: "food_classifier"
+name: "gpu_food_classifier"   # Should match the name of the model directory
 backend: "python"
-max_batch_size: 1
+max_batch_size: 1             # This ensures multiple inferences requests aren't batched together
 input [
   {
     name: "INPUT_IMAGE"
-    data_type: TYPE_STRING
+    data_type: TYPE_STRING    # Input image is sent as a stream of bytes
     dims: [1]
   }
 ]
 output [
   {
     name: "FOOD_LABEL"
-    data_type: TYPE_STRING
+    data_type: TYPE_STRING    # Food11 classifier predicted Label 
     dims: [1]
   },
   {
     name: "PROBABILITY"
-    data_type: TYPE_FP32
+    data_type: TYPE_FP32      # Food11 classifier probability for the laba
     dims: [1]
+  }
+]
+instance_group [
+  {
+    kind: KIND_GPU            # Tells Triton to run the inference on a GPU
+    count: 1                  # Use 1 GPU                  
+    gpus: [0]                 # User Device 0 as our GPU
   }
 ]
