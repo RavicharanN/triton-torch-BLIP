@@ -69,7 +69,14 @@ model_repository/
 │       └── model.pt
 ```
 
-### Config.pbtxt
+`config.pbtxt` describes model metadata like  model inputs/outputs, optimization settings, resource allocations, and batching options. We will look at the config.pbtxt options in the coming sections
+
+## Testing with different Configs for Food11
+
+
+
+## Conditional Captioning with Ensembles 
+
 
 
 ### ========  Documentation beyond this point is WIP ============================
