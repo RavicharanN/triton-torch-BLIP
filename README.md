@@ -28,6 +28,21 @@ sudo docker run --gpus all \
 
 This command mounts your `model_repository` into the Triton container and serves the models on `localhost:8000`.
 
+If the all the models are successfully loaded you will see a console output like this: 
+
+```
++------------------------+---------+--------+
+| Model                  | Version | Status |
++------------------------+---------+--------+
+| conditional_captioning | 1       | READY  |
+| ensemble               | 1       | READY  |
+| food_classifier        | 1       | READY  |
+| gpu_food_classifier    | 1       | READY  |
++------------------------+---------+--------+
+```
+
+Leave this running and open another console for the next step
+
 ### Triton Client and FastAPI Server
 
 Next, we'll launch another container to handle the rest of our experiments:
