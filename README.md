@@ -38,7 +38,7 @@ Next, we'll launch another container to handle the rest of our experiments:
 
 To build the Docker image for this container, run:
 ```
-docker build -f Dockerfile.triton -t fastapi-jupyter-image .
+docker build -f Dockerfile.api -t fastapi-jupyter-image .
 ```
 Start the FastAPI server (running on port 8080) and a Jupyter server (running on port 8888) with:
 ```
