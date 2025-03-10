@@ -183,26 +183,21 @@ ensemble_scheduling {
 }
 ``` 
 
+## Performance analyzer  
 
-### ========  Documentation beyond this point is WIP ============================
-Make this avaialbe on your local machine by enabling SSH tunneling
-
-```
-ssh -L 8080:localhost:8080 -i path_to_rsa cc@a.b.c.d
-```
-
-We will use the Swagger UI accessible at `localhost:8080/#docs` to test the endpoint. Upload and image of your choice and you will see the caption generated in the request's response
-
-
-## Performance analyzer comparisions 
-
-The `perf_analyzer` tools allows us to send concurrent inference requests to the deployed model and measure its stats like throughput and latency over a specifed widow (10 seconds in this command)
+The `perf_analyzer` tools allows us to send concurrent inference requests to the deployed model and measure its stats like throughput and latency over a specifed widow (10 seconds in this command). 
 
 ```
-perf_analyzer -m multi_gpu_dynamic_batching localhost:8000 --concurrency-range 1:16:2 --input-data dummy.json --measurement-interval 10000
+perf_analyzer -m <model_name> localhost:8000 --concurrency-range 4:32:4 --input-data input.json 
 ```
 
-Replace `multi_gpu_dynamic_batching` with appropriate models to profile all the models.
+Available models in the model repository
+
+* `food_classifier` : Food 11 classifier on CPU
+* `gpu_food_classifier` : Food 11 Classifier on GPU
+* `batching_food_classifier` : Dynamic batching
+* `multigpu_food_classifier` : Concurrent Execution
+* `ensemble` : Conditional Image captioning
 
 The results of the performance analyzer experiments on different configs is [linked here](https://docs.google.com/document/d/19h2KS1Ec0joOoNzzzspa8D8L24xzdzHU4pegB9TbNhs/edit?tab=t.0)
 
