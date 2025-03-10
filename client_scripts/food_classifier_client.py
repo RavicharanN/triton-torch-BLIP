@@ -14,7 +14,7 @@ triton_client = httpclient.InferenceServerClient(url="localhost:8000", verbose=F
 inputs = []
 inputs.append(httpclient.InferInput("INPUT_IMAGE", [1, 1], "BYTES"))
 encoded_str =  base64.b64encode(image_bytes).decode("utf-8")
-input_data = np.array([[image_bytes]], dtype=object)
+input_data = np.array([[encoded_str]], dtype=object)
 inputs[0].set_data_from_numpy(input_data)
 
 outputs = []
