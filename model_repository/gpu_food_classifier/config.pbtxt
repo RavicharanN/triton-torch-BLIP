@@ -24,6 +24,6 @@ instance_group [
   {
     kind: KIND_GPU            # Tells Triton to run the inference on a GPU
     count: 1                  # Use 1 GPU                  
-    gpus: [0]                 # User Device 0 as our GPU
+    gpus: [1]                 # User Device 0 as our GPU
   }
 ]

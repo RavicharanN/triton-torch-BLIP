@@ -4,8 +4,13 @@ max_batch_size: 16
 instance_group [
   {
     kind: KIND_GPU
-    count: 2                # Run inference concurrently on both the GPUs
-    gpus: [0, 1]            
+    count: 1                # Run inference concurrently on both the GPUs
+    gpus: [0]            
+  },
+  {
+    kind: KIND_GPU
+    count: 1
+    gpus: [1]
   }
 ]
 dynamic_batching {

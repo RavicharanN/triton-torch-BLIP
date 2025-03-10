@@ -49,37 +49,40 @@ class TritonPythonModel:
         return img_tensor
 
     def execute(self, requests):
-        responses = []
+        # Gather inputs from all requests
+        batched_inputs = []
         for request in requests:
             in_tensor = pb_utils.get_input_tensor_by_name(request, "INPUT_IMAGE")
-            input_data_array = in_tensor.as_numpy()  # Expected shape: [batch_size, 1]
-            batch_size = input_data_array.shape[0]
-
-            output_labels = []
-            output_probs = []
-
-            for i in range(batch_size):
-                image_data = input_data_array[i, 0]
-                image_tensor = self.preprocess(image_data)
-                image_tensor = image_tensor.to(self.device)
-
-                with torch.no_grad():
-                    output = self.model(image_tensor)
-                    prob, predicted_class = torch.max(output, 1)
-                    predicted_label = self.classes[predicted_class.item()]
-                    probability = torch.sigmoid(prob).item()
-
-                output_labels.append(predicted_label)
-                output_probs.append(probability)
-
-            # Create numpy arrays with shape [batch_size, 1] for consistency.
-            out_label_np = np.array(output_labels, dtype=object).reshape(batch_size, 1)
-            out_prob_np = np.array(output_probs, dtype=np.float32).reshape(batch_size, 1)
-
+            input_data_array = in_tensor.as_numpy()  # each assumed to be shape [1]
+            # Preprocess each input (resulting in a tensor of shape [1, C, H, W])
+            batched_inputs.append(self.preprocess(input_data_array[0, 0]))
+        
+        # Combine inputs along the batch dimension
+        batched_tensor = torch.cat(batched_inputs, dim=0).to(self.device)
+        print("BatchSize: ", len(batched_inputs))
+        # Run inference once on the full batch
+        with torch.no_grad():
+            outputs = self.model(batched_tensor)
+        
+        # Process the outputs and split them for each request
+        responses = []
+        for i, request in enumerate(requests):
+            output = outputs[i:i+1]  # select the i-th output
+            prob, predicted_class = torch.max(output, 1)
+            predicted_label = self.classes[predicted_class.item()]
+            probability = torch.sigmoid(prob).item()
+            
+            # Create numpy arrays with shape [1, 1] for consistency.
+            out_label_np = np.array([[predicted_label]], dtype=object)
+            out_prob_np = np.array([[probability]], dtype=np.float32)
+            
             out_tensor_label = pb_utils.Tensor("FOOD_LABEL", out_label_np)
             out_tensor_prob = pb_utils.Tensor("PROBABILITY", out_prob_np)
-
+            
             inference_response = pb_utils.InferenceResponse(
                 output_tensors=[out_tensor_label, out_tensor_prob])
             responses.append(inference_response)
+        
         return responses
+
+

@@ -13,12 +13,11 @@ class TritonPythonModel:
     def initialize(self, args):
         model_dir = os.path.dirname(__file__)
         model_path = os.path.join(model_dir, "food11.pth")
-        self.device = torch.device('cuda') 
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         
         # Use safe_globals to allow the MobileNetV2 global
         with torch.serialization.safe_globals([MobileNetV2]):
             self.model = torch.load(model_path, map_location=self.device, weights_only=False)
-        self.model.to(self.device)
         self.model.eval()
         
         self.transform = transforms.Compose([
@@ -52,8 +51,6 @@ class TritonPythonModel:
     def execute(self, requests):
         responses = []
         for request in requests:
-            #print("TRITON_INSTANCE_ID:", os.environ.get("TRITON_INSTANCE_ID"))
-            #print("CUDA_VISIBLE_DEVICES:", os.environ.get("CUDA_VISIBLE_DEVICES"))
             in_tensor = pb_utils.get_input_tensor_by_name(request, "INPUT_IMAGE")
             input_data_array = in_tensor.as_numpy()  # Expected shape: [batch_size, 1]
             batch_size = input_data_array.shape[0]
@@ -62,6 +59,7 @@ class TritonPythonModel:
             output_probs = []
 
             for i in range(batch_size):
+                print("Batch Size:", batch_size)
                 image_data = input_data_array[i, 0]
                 image_tensor = self.preprocess(image_data)
                 image_tensor = image_tensor.to(self.device)
@@ -86,4 +84,3 @@ class TritonPythonModel:
                 output_tensors=[out_tensor_label, out_tensor_prob])
             responses.append(inference_response)
         return responses
-
