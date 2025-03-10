@@ -19,6 +19,11 @@ class TritonPythonModel:
         if isinstance(image_data, str):
             image_data = base64.b64decode(image_data)
             
+        if isinstance(image_data, bytes):
+            #print("Recognised as bytes \n")
+            image_data = image_data.decode("utf-8")
+            image_data = base64.b64decode(image_data)
+            
         image = Image.open(io.BytesIO(image_data)).convert('RGB')
         return image
 
