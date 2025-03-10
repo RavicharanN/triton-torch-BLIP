@@ -1,0 +1,35 @@
+name: "batching_food_classifier"   # Should match the name of the model directory
+backend: "python"
+max_batch_size: 16
+instance_group [
+  {
+    kind: KIND_GPU
+    count: 1
+    gpus: [0]
+  }
+]
+dynamic_batching {
+  preferred_batch_size: [2, 4, 8, 16]
+
+  # This scheduling delay tells Triton how long to wait for additional requests. helps batch larger group of requests
+  max_queue_delay_microseconds: 100000
+}             
+input [
+  {
+    name: "INPUT_IMAGE"
+    data_type: TYPE_STRING    # Input image is sent as a stream of bytes
+    dims: [1]
+  }
+]
+output [
+  {
+    name: "FOOD_LABEL"
+    data_type: TYPE_STRING    # Food11 classifier predicted Label 
+    dims: [1]
+  },
+  {
+    name: "PROBABILITY"
+    data_type: TYPE_FP32      # Food11 classifier probability for the laba
+    dims: [1]
+  }
+]
