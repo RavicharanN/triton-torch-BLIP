@@ -144,6 +144,44 @@ instance_group [
 ]
 ```
 
+## Model ensembles 
+
+Similar to the Food11 classifier, we've defined a BLIP captioning model in our model repository. Next, we'll create a model ensemble, where the predicted labels from the Food11 classifier and the original image serve as inputs to a conditional captioning model to generate context-aware captions.
+
+```
+ensemble_scheduling {
+  step [
+    {
+      model_name: "food_classifier"
+      model_version: -1      # Tells triton to use the latest version of the model
+      input_map {
+        key: "INPUT_IMAGE"   # Map the input of the ensemble to the input of the food classifier
+        value: "INPUT_IMAGE"
+      }
+      output_map {
+        key: "FOOD_LABEL"    # Map the output of classifier to text input of the captioning model
+        value: "FOOD_LABEL"
+      }
+    },
+    {
+      model_name: "conditional_captioning"
+      model_version: -1      # Tells triton to use the latest version of the model
+      input_map {
+        key: "INPUT"
+        value: "INPUT_IMAGE"
+      }
+      input_map {
+        key: "FOOD_LABEL"    # Map the output of classifier to the condition for the captioning model 
+        value: "FOOD_LABEL"
+      }
+      output_map {
+        key: "OUTPUT"
+        value: "OUTPUT"
+      }
+    }
+  ]
+}
+``` 
 
 
 ### ========  Documentation beyond this point is WIP ============================
