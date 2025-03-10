@@ -1,18 +1,23 @@
-# Model Serving 
+# Model Serving - Image captioning with BLIP
 
-We're using NVIDIA's Triton to serve our Food11 Classifier model, and will be running experiments to leverage the systems resources to speed up inference and boost throughput at scale.
+The experiments will be run on a P100 node on Chameleon. Clone this repository on your P100 node.
 
-We'll also perform conditional captioning using model ensembling — generating a caption for the image based on the label output from the classifier, which is then fed into the BLIP captioning model.
+Run the 	`create_server.ipynb` on the Chameleon interface to start your instance and install all dependencies for the experiment. 
 
-The experiments will be run on a P100 node on Chameleon.  Run the `create_server.ipynb` on the Chameleon interface to start your instance and install all dependencies for the experiment. Clone this repository on your P100 node.
 
 ## Experimental Setup
 
-We will deploy our models on the Triton Inference Server in a container running on the P100 node, and run everything else (profiling, serving the model through an endpoint) on a separate Python container.
+| URL | Service | 
+|------------------|---| 
+| localhost:8000 | Triton Inference Server | 
+| localhost:8080 | FastAPI server | 
+| localhost:8888 | Jupyter notebook (model profiling) |
 
-### Triton Server 
+Triton Server runs in a standalone container and the rest run on a seperate Python container. 
 
-The `Dockerfile.triton` pulls the Triton container and installs all the dependencies needed for inference. This file is already provided in the repository (more details on the Triton's `model_repository` structure and configurations are in the next section).
+#### Launch the Triton Server 
+
+The `Dockerfile.triton` pulls the Triton container and installs all the dependencies needed for inference. 
 
 To build the docker image, run:
 ```
@@ -22,38 +27,17 @@ Launch the triton server with:
 ```
 sudo docker run --gpus all \ 
 	--rm -p 8000:8000 -p 8001:8001 -p 8002:8002 \
-	-v ${PWD}/model_repository:/models tritonserver-image \
+	-v ${PWD}/model_repository:/models custom-tritonserver \
 	tritonserver --model-repository=/models
 ```
 
 This command mounts your `model_repository` into the Triton container and serves the models on `localhost:8000`.
 
-If the all the models are successfully loaded you will see a console output like this: 
-
-```
-+------------------------+---------+--------+
-| Model                  | Version | Status |
-+------------------------+---------+--------+
-| conditional_captioning | 1       | READY  |
-| ensemble               | 1       | READY  |
-| food_classifier        | 1       | READY  |
-| gpu_food_classifier    | 1       | READY  |
-+------------------------+---------+--------+
-```
-
-Leave this running and open another console for the next step
-
-### Triton Client and FastAPI Server
-
-Next, we'll launch another container to handle the rest of our experiments:
-
-1.  Serving models through a FastAPI endpoint.
-2.  Running Python scripts that send inference requests to the Triton Server (for testing the model deployment with an example).
-3.  Profiling the models on the Triton Server under load.
+#### Triton Client and FastAPI Server
 
 To build the Docker image for this container, run:
 ```
-docker build -f Dockerfile.api -t fastapi-jupyter-image .
+docker build -f Dockerfile.triton -t fastapi-jupyter-image .
 ```
 Start the FastAPI server (running on port 8080) and a Jupyter server (running on port 8888) with:
 ```
@@ -64,7 +48,7 @@ sudo docker run --name fastapi-jupyter-container \
 	fastapi-jupyter-image
 ```
 
-## Understanding the Triton Repository and Config Structure 
+## Triton Model Repository Structure 
 
 The Triton Inference Server uses a structured directory (model repository) to manage and serve our models. Each model served by Triton resides in its own directory within the `model_repository`, and each directory follows a specific naming and versioning convention.
 
@@ -86,11 +70,79 @@ model_repository/
 
 `config.pbtxt` describes model metadata like  model inputs/outputs, optimization settings, resource allocations, and batching options. We will look at the config.pbtxt options in the coming sections
 
-## Model serving optimizations on Food11 
+## Configs for Food11 Classifier
 
+### Food11 Classifier CPU
+`config.pbtxt`
+```
+name: "food_classifier"		# Name should the same as model repo
+backend: "python"
+max_batch_size: 1			
+input [
+  {
+    name: "INPUT_IMAGE"
+    data_type: TYPE_STRING	# Input image provided as base64 encoded string
+    dims: [1]
+  }
+]
+output [					# Classified label and the probability 
+  {
+    name: "FOOD_LABEL"
+    data_type: TYPE_STRING	
+    dims: [1]
+  },
+  {
+    name: "PROBABILITY"
+    data_type: TYPE_FP32
+    dims: [1]
+  }
+]
+```
+### Food11 Classifier - GPU
 
+We define the instance kind as GPU to run the inference on GPU. It's defaulted to CPU if `instance_group` isn't defined. Add the following to `config.pbtxt`
 
-## Conditional Captioning with Ensembles 
+```
+instance_group [
+  {
+    kind: KIND_GPU            # Tells Triton to run the inference on a GPU
+    count: 1                  # Use 1 GPU                  
+    gpus: [0]                 # Use Device 0 as our GPU
+  }
+]
+```
+
+### Dynamic Batching
+
+Triton allows us to batch incoming requests and run the inference together. We will also update the `max_batch_size`
+```
+max_batch_size: 16 			# We will also update the max batch size
+dynamic_batching {
+  preferred_batch_size: [4, 8, 16]
+
+  # This scheduling delay tells Triton how long to wait for additional requests. helps batch larger group of requests
+  max_queue_delay_microseconds: 1000000
+}             
+```
+
+### Concurrent Inference - Multi GPU
+
+Enable inferences on multiple GPUs by defining another instance group.
+
+```
+instance_group [
+  {
+    kind: KIND_GPU            
+    count: 1              # Runs one instance of the model on GPU 0                  
+    gpus: [0]                 
+  }
+  {
+    kind: KIND_GPU            
+    count: 1              # Runs one instance of the model on GPU 1              
+    gpus: [1]                 
+  }
+]
+```
 
 
 
