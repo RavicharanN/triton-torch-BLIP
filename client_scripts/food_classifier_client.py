@@ -22,7 +22,7 @@ outputs.append(httpclient.InferRequestedOutput("FOOD_LABEL", binary_data=False))
 outputs.append(httpclient.InferRequestedOutput("PROBABILITY", binary_data=False))
 
 # Run inference
-results = triton_client.infer(model_name="food_classifier", inputs=inputs, outputs=outputs)
+results = triton_client.infer(model_name="gpu_food_classifier", inputs=inputs, outputs=outputs)
 
 # Extract and print results
 food_label = results.as_numpy("FOOD_LABEL")

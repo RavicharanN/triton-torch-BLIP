@@ -18,6 +18,7 @@ class TritonPythonModel:
         # Use safe_globals to allow the MobileNetV2 global
         with torch.serialization.safe_globals([MobileNetV2]):
             self.model = torch.load(model_path, map_location=self.device, weights_only=False)
+        self.model.to(self.device)
         self.model.eval()
         
         self.transform = transforms.Compose([
