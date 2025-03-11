@@ -25,10 +25,10 @@ docker build -f Dockerfile.triton -t tritonserver-image .
 ```
 Launch the triton server with:
 ```
-sudo docker run --gpus all \ 
-	--rm -p 8000:8000 -p 8001:8001 -p 8002:8002 \
-	-v ${PWD}/model_repository:/models custom-tritonserver \
-	tritonserver --model-repository=/models
+sudo docker run --gpus all \
+    -p 8000:8000 -p 8001:8001 -p 8002:8002 \
+    -v ${PWD}/model_repository:/models custom-tritonserver \
+    tritonserver --model-repository=/models
 ```
 
 This command mounts your `model_repository` into the Triton container and serves the models on `localhost:8000`.
