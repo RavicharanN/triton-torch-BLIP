@@ -9,10 +9,10 @@ instance_group [
   }
 ]
 dynamic_batching {
-  preferred_batch_size: [4, 8, 16]
+  #preferred_batch_size: [4, 6, 8, 10]
 
   # This scheduling delay tells Triton how long to wait for additional requests. helps batch larger group of requests
-  max_queue_delay_microseconds: 1000000
+  max_queue_delay_microseconds: 100
 }             
 input [
   {
