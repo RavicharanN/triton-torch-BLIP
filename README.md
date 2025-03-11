@@ -37,7 +37,7 @@ This command mounts your `model_repository` into the Triton container and serves
 
 To build the Docker image for this container, run:
 ```
-docker build -f Dockerfile.triton -t fastapi-jupyter-image .
+docker build -f Dockerfile.api -t fastapi-jupyter-image .
 ```
 Start the FastAPI server (running on port 8080) and a Jupyter server (running on port 8888) with:
 ```
@@ -106,8 +106,8 @@ We define the instance kind as GPU to run the inference on GPU. It's defaulted t
 instance_group [
   {
     kind: KIND_GPU            # Tells Triton to run the inference on a GPU
-    count: 1                  # Use 1 GPU                  
-    gpus: [0]                 # Use Device 0 as our GPU
+    count: 1                  # Runs 1 instance of the model on GPU 0                 
+    gpus: [0]                 
   }
 ]
 ```
