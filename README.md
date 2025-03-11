@@ -186,8 +186,10 @@ ensemble_scheduling {
 The `perf_analyzer` tools allows us to send concurrent inference requests to the deployed model and measure its stats like throughput and latency over a specifed widow (10 seconds in this command). 
 
 ```
-perf_analyzer -m <model_name> localhost:8000 --concurrency-range 4:32:4 --input-data input.json 
+perf_analyzer -m <model_name> localhost:8000 --concurrency-range 2:12:2 --input-data input.json 
 ```
+
+`--concurrency-range 2:12:2`: Sends a continuous stream of concurrent inference requests to the model, starting with 2 simultaneous requests and incrementally increasing up to 12 simultaneous requests, in steps of 2 (i.e., concurrency levels of 2, 4, 6, 8, 10, and 12)
 
 Available models in the model repository
 
