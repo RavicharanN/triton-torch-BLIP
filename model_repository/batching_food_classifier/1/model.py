@@ -60,7 +60,7 @@ class TritonPythonModel:
         
         # Combine inputs along the batch dimension
         batched_tensor = torch.cat(batched_inputs, dim=0).to(self.device)
-        print("BatchSize: ", len(batched_inputs))
+        #print("BatchSize: ", len(batched_inputs))
         # Run inference once on the full batch
         with torch.no_grad():
             outputs = self.model(batched_tensor)
