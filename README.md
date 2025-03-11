@@ -39,7 +39,7 @@ To build the Docker image for this container, run:
 ```
 docker build -f Dockerfile.api -t fastapi-jupyter-image .
 ```
-Start the FastAPI server (running on port 8080) and a Jupyter server (running on port 8888) with:
+Start the FastAPI server (running on port 8080) and a Jupyter notebook (running on port 8888) with:
 ```
 sudo docker run --name fastapi-jupyter-container \ 
 	-p 8080:8080 \
