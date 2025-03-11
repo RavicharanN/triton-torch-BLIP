@@ -58,13 +58,13 @@ The Triton model repository structure looks like this:
 model_repository/
 ├── model_A/
 │   ├── config.pbtxt
-│   └── 1/				# Version 1 of model_A
+│   └── 1/			# Version 1 of model_A
 │       └── model.py	
 ├── model_B/
-│   ├── config.pbtxt	# Config files can be unique to each model
-│   ├── 1/				# Version 1 of model_B
+│   ├── config.pbtxt		# Config files can be unique to each model
+│   ├── 1/			# Version 1 of model_B
 │   │   └── model.pt
-│   └── 2/				# Version 2 of model_B
+│   └── 2/			# Version 2 of model_B
 │       └── model.pt
 ```
 
@@ -77,7 +77,7 @@ model_repository/
 ```
 name: "food_classifier"		# Name should the same as model repo
 backend: "python"
-max_batch_size: 1			
+max_batch_size: 1		# Each inference request will always be handled individually, even if multiple requests are sent concurrently.	
 input [
   {
     name: "INPUT_IMAGE"
@@ -85,7 +85,7 @@ input [
     dims: [1]
   }
 ]
-output [					# Classified label and the probability 
+output [			# Predicted label and the probability by the food11 model
   {
     name: "FOOD_LABEL"
     data_type: TYPE_STRING	
@@ -116,12 +116,10 @@ instance_group [
 
 Triton allows us to batch incoming requests and run the inference together. We will also update the `max_batch_size`
 ```
-max_batch_size: 16 			# We will also update the max batch size
+max_batch_size: 16 			# Triton can batch up to 16 inference requests at once
 dynamic_batching {
-  preferred_batch_size: [4, 8, 16]
-
-  # This scheduling delay tells Triton how long to wait for additional requests. helps batch larger group of requests
-  max_queue_delay_microseconds: 1000000
+  preferred_batch_size: [4, 8]		# Triton will prioritize forming batches of size 4 or 8, if possible.
+  max_queue_delay_microseconds: 100	# This scheduling delay tells Triton how long to wait for additional requests. helps batch larger group of requests
 }             
 ```
 
