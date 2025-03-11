@@ -23,7 +23,7 @@ output [
 instance_group [
   {
     kind: KIND_GPU            # Tells Triton to run the inference on a GPU
-    count: 1                  # Runs 1 instance of the GPU on device 1             
-    gpus: [1]                 
+    count: 1                  # Runs 1 instance of the GPU on device 0            
+    gpus: [0]                 
   }
 ]
