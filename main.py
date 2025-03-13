@@ -7,14 +7,13 @@ app = FastAPI()
 
 # Triton configuration
 TRITON_URL = "localhost:8000"
-MODEL_NAME = "base_model"
+MODEL_NAME = "ensemble"
 
 @app.post("/caption")
 async def caption_image(file: UploadFile = File(...)):
     try:
         # Read uploaded file's bytes
         image_bytes = await file.read()
-        
         # Encode image bytes using Base64
         encoded_str = base64.b64encode(image_bytes).decode("utf-8")
         # Create numpy array with shape [1,1] to match Triton's expected input shape

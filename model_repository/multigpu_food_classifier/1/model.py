@@ -13,8 +13,15 @@ class TritonPythonModel:
     def initialize(self, args):
         model_dir = os.path.dirname(__file__)
         model_path = os.path.join(model_dir, "food11.pth")
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        #self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         
+        instance_kind = args.get("model_instance_kind", "cpu").lower()
+        if instance_kind == "gpu":
+            device_id = int(args.get("model_instance_device_id", 0))
+            torch.cuda.set_device(device_id)
+        
+        self.device = torch.device(f"cuda:{device_id}" if torch.cuda.is_available() else 'cpu')
+
         # Use safe_globals to allow the MobileNetV2 global
         with torch.serialization.safe_globals([MobileNetV2]):
             self.model = torch.load(model_path, map_location=self.device, weights_only=False)
