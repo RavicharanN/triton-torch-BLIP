@@ -1,6 +1,6 @@
 name: "multigpu_food_classifier"   # Should match the name of the model directory
 backend: "python"
-max_batch_size: 16
+max_batch_size: 128
 instance_group [
   {
     kind: KIND_GPU
@@ -13,12 +13,12 @@ instance_group [
     gpus: [1]
   }
 ]
-dynamic_batching {
-  preferred_batch_size: [2, 4, 8, 16]
+# dynamic_batching {
+  # preferred_batch_size: [2, 4, 8, 16]
 
   # This scheduling delay tells Triton how long to wait for additional requests. helps batch larger group of requests
-  max_queue_delay_microseconds: 100000
-}             
+  #max_queue_delay_microseconds: 100000
+#}             
 input [
   {
     name: "INPUT_IMAGE"
