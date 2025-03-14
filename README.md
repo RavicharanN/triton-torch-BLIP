@@ -1,4 +1,4 @@
-# Model Serving - Image captioning with BLIP
+# Model Serving with NVIDIA Triton 
 
 The experiments will be run on a P100 node on Chameleon. Clone this repository on your P100 node.
 
