@@ -19,8 +19,9 @@ class TritonPythonModel:
         if instance_kind == "gpu":
             device_id = int(args.get("model_instance_device_id", 0))
             torch.cuda.set_device(device_id)
-        
-        self.device = torch.device(f"cuda:{device_id}" if torch.cuda.is_available() else 'cpu')
+            self.device = torch.device(f"cuda:{device_id}")
+        else: 
+            self.device = torch.device('cpu')
 
         # Use safe_globals to allow the MobileNetV2 global
         with torch.serialization.safe_globals([MobileNetV2]):
@@ -67,7 +68,7 @@ class TritonPythonModel:
         
         # Combine inputs along the batch dimension
         batched_tensor = torch.cat(batched_inputs, dim=0).to(self.device)
-        print("BatchSize: ", len(batched_inputs))
+        # print("BatchSize: ", len(batched_inputs))
         # Run inference once on the full batch
         with torch.no_grad():
             outputs = self.model(batched_tensor)
